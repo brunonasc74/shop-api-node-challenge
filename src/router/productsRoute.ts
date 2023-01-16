@@ -4,7 +4,7 @@ const router = Router();
 
 router
 	.get('/products', ProductController.getAllProducts)
-	.post('/products')
+	.post('/products', ProductController.createProduct)
 	.get('/products/:id')
 	.put('/products/:id')
 	.delete('/products/:id');
