@@ -28,7 +28,7 @@ class ProductController {
 			const theProduct = await prisma.product.findMany({ take: -1 });
 
 			res.status(201).send({
-				success: 'product created',
+				success: 'Product created',
 				productInfo: theProduct
 			});
 		} catch (err: any) {
@@ -52,7 +52,7 @@ class ProductController {
 			if (!selectedProduct)
 				return res
 					.status(404)
-					.send({ error: `product of id ${id} does not exist` });
+					.send({ error: `Product of id ${id} does not exist` });
 
 			res.status(200).send(selectedProduct);
 		} catch (err: any) {
@@ -71,7 +71,7 @@ class ProductController {
 			if (!selectedProduct) {
 				return res
 					.status(404)
-					.send({ error: `product of id ${id} does not exist` });
+					.send({ error: `Product of id ${id} does not exist` });
 			}
 			const validatedData = await validateRequest(req);
 			const newInfo = validatedData;
@@ -85,7 +85,7 @@ class ProductController {
 				});
 			if (isEqual)
 				return res.status(200).send({
-					warning: `product of id ${id} was not updated, the values are the same`,
+					warning: `Product of id ${id} was not updated, the values are the same`,
 					productInfo: selectedProduct
 				});
 			const updatedProduct = await prisma.product.update({
@@ -94,7 +94,7 @@ class ProductController {
 			});
 
 			res.status(200).send({
-				success: `product of id ${id} updated`,
+				success: `Product of id ${id} updated`,
 				updatedProductInfo: updatedProduct
 			});
 		} catch (err: any) {
@@ -104,6 +104,39 @@ class ProductController {
 			} else {
 				res.status(400).send(err.message);
 			}
+		}
+	}
+
+	// @desc   Delete selected product
+	// @route  DELETE /products/:id
+	static async deleteProduct(req: Request, res: Response) {
+		const { id } = req.params;
+		try {
+			const selectedProduct = await prisma.product.findUnique({
+				where: { id: +id }
+			});
+			if (!selectedProduct)
+				return res
+					.status(404)
+					.send({ error: `Product of id ${id} does not exist` });
+			if (selectedProduct.deleted_at !== null)
+				return res.status(400).send({
+					error: `Product of id ${id} has already been deleted`,
+					deletedProduct: selectedProduct
+				});
+			await prisma.product.update({
+				where: { id: +id },
+				data: { deleted_at: new Date() }
+			});
+			const recordedProduct = await prisma.product.findUnique({
+				where: { id: +id }
+			});
+			return res.status(200).send({
+				success: `Product of id ${id} deleted`,
+				deletedProductInfo: recordedProduct
+			});
+		} catch (err: any) {
+			res.status(400).send(err.message);
 		}
 	}
 }
