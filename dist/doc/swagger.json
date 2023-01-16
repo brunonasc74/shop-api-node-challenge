@@ -1,0 +1,342 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Backend test",
+        "version": "1.0.0",
+        "description": "This document outlines the API of the Backend challenge."
+    },
+    "components": {
+        "schemas": {
+            "Product": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "number",
+                        "description": "Auto generated id of the product",
+                        "readOnly": true
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name of the product"
+                    },
+                    "category": {
+                        "type": "string",
+                        "description": "Category of the product"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Status of the product in which it is ACTIVE or INACTIVE"
+                    },
+                    "quantity": {
+                        "type": "number",
+                        "description": "Product quantity available"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "description": "The auto generated time the product was created",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "description": "The auto generated time the product was updated",
+                        "readOnly": true
+                    },
+                    "deleted_at": {
+                        "type": "string",
+                        "description": "The auto generated time the product was deleted (null if product was not deleted)",
+                        "readOnly": true
+                    }
+                },
+                "required": [
+                    "name",
+                    "category",
+                    "quantity"
+                ],
+                "example": {
+                    "id": 1,
+                    "name": "First Product",
+                    "category": "Category of Product-1",
+                    "status": "ACTIVE",
+                    "created_at": "2023-01-16T16:09:24.638Z",
+                    "updated_at": "2023-01-16T16:09:24.638Z",
+                    "deleted_at": null
+                }
+            }
+        }
+    },
+    "paths": {
+        "/products": {
+            "get": {
+                "tags": ["Products"],
+                "summary": "Return all products",
+                "operationId": "getAllProducts",
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Product"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Products"],
+                "summary": "Create a new product",
+                "operationId": "createProduct",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "example": {
+                                    "name": "New Product",
+                                    "category": "Category the New Product",
+                                    "status": "INACTIVE",
+                                    "quantity": 30
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successfully created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "Product created"
+                                        },
+                                        "productInfo": {
+                                            "$ref": "#/components/schemas/Product"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Validation error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/Products/{id}": {
+            "get": {
+                "tags": ["Products"],
+                "summary": "Return selected product by id, it can even return deleted products by id for future implementations to recover it",
+                "operationId": "getOneProduct",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to retrieve",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Product"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Product with specified ID not found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": ["Products"],
+                "summary": "Update a product",
+                "operationId": "editProduct",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Update selected product by id",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "example": {
+                                    "name": "Product ready to be updated",
+                                    "category": "A category ready to be updated",
+                                    "status": "INACTIVE",
+                                    "quantity": 2
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "Product updated"
+                                        },
+                                        "productInfo": {
+                                            "$ref": "#/components/schemas/Product"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request - Validation error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Validation error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Product with specified ID not found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Products"],
+                "summary": "Delete a product",
+                "operationId": "deleteProduct",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the product to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Product deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "Product deleted"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Product already deleted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "example": "Product of id was already deleted"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Product not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Product with specified ID not found"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
