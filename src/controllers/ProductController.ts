@@ -40,6 +40,72 @@ class ProductController {
 			}
 		}
 	}
+
+	// @desc   Return selected product
+	// @route  GET /products/:id
+	static async getOneProduct(req: Request, res: Response) {
+		const { id } = req.params;
+		try {
+			const selectedProduct = await prisma.product.findUnique({
+				where: { id: +id }
+			});
+			if (!selectedProduct)
+				return res
+					.status(404)
+					.send({ error: `product of id ${id} does not exist` });
+
+			res.status(200).send(selectedProduct);
+		} catch (err: any) {
+			res.status(400).send(err.message);
+		}
+	}
+
+	// @desc   Edit selected product
+	// @route  PUT /products/:id
+	static async editProduct(req: Request, res: Response) {
+		const { id } = req.params;
+		try {
+			const selectedProduct = await prisma.product.findUnique({
+				where: { id: +id }
+			});
+			if (!selectedProduct) {
+				return res
+					.status(404)
+					.send({ error: `product of id ${id} does not exist` });
+			}
+			const validatedData = await validateRequest(req);
+			const newInfo = validatedData;
+			const isEqual = Object.entries(newInfo).every(
+				([key, value]) => selectedProduct[key] === value
+			);
+			if (selectedProduct.deleted_at !== null)
+				return res.status(400).send({
+					error: `It was not possible to update product of id ${id}, it has already been deleted`,
+					deletedProduct: selectedProduct
+				});
+			if (isEqual)
+				return res.status(200).send({
+					warning: `product of id ${id} was not updated, the values are the same`,
+					productInfo: selectedProduct
+				});
+			const updatedProduct = await prisma.product.update({
+				where: { id: +id },
+				data: newInfo
+			});
+
+			res.status(200).send({
+				success: `product of id ${id} updated`,
+				updatedProductInfo: updatedProduct
+			});
+		} catch (err: any) {
+			if (err instanceof yup.ValidationError) {
+				const errorMessage = err.inner.map((err) => err.message).join(', ');
+				res.status(400).send({ validationFailed: errorMessage });
+			} else {
+				res.status(400).send(err.message);
+			}
+		}
+	}
 }
 
 export default ProductController;

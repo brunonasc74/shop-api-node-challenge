@@ -5,8 +5,8 @@ const router = Router();
 router
 	.get('/products', ProductController.getAllProducts)
 	.post('/products', ProductController.createProduct)
-	.get('/products/:id')
-	.put('/products/:id')
+	.get('/products/:id', ProductController.getOneProduct)
+	.put('/products/:id', ProductController.editProduct)
 	.delete('/products/:id');
 
 export default router;
