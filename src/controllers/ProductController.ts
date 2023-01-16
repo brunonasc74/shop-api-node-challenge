@@ -4,6 +4,17 @@ import validateRequest from '../utility/yupValidation';
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
+interface Product {
+	id: number;
+	name: string;
+	category: string;
+	status: string;
+	quantity: number;
+	created_at: string;
+	updated_at?: string;
+	deleted_at?: string;
+}
+
 class ProductController {
 	// @desc   Return all products
 	// @route  GET /products
@@ -76,7 +87,7 @@ class ProductController {
 			const validatedData = await validateRequest(req);
 			const newInfo = validatedData;
 			const isEqual = Object.entries(newInfo).every(
-				([key, value]) => selectedProduct[key] === value
+				([key, value]) => selectedProduct[key as keyof Product] === value
 			);
 			if (selectedProduct.deleted_at !== null)
 				return res.status(400).send({
