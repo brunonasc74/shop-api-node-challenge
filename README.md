@@ -15,9 +15,8 @@ yarn
 yarn dev
 
 # with npm
-git clone git@github.com:brunonasc74/Banco-de-talentos.git
-cd .\Banco-de-talentos\backend
-git checkout bruno-nascimento-backend
+git clone git@github.com:brunonasc74/shop-api-node-challenge.git
+cd .\shop-api-node-challenge
 npm install
 npm run dev
 ```
